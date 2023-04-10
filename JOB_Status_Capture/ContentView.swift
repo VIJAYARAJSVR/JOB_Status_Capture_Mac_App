@@ -158,7 +158,7 @@ struct MainView: View {
             fileURL = fileURL.appendingPathExtension("json")
             try data.write(to: fileURL, options: [.atomicWrite])
             statusInfo = "Saved Successfully"
-            getDocumentsDirectory();
+//            getDocumentsDirectory();
             
             ClearAllState()
             return true
