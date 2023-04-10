@@ -8,16 +8,16 @@
 import Foundation
 import Foundation
 
-struct JobDetail:Codable {
+struct JobStatusLater:Codable {
     
     
     var Company:String
     var Designation:String
     var Status:String
-    var AppliedDate:String
-    var AppliedTime:String
-    var StatusID:String
+    var StatusID:Int8
     var Source:String
+    var Record_Created:String
+
     
 }
     

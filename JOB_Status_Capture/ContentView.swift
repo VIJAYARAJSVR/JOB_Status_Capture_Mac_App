@@ -62,8 +62,8 @@ struct MainView: View {
     //@State var PostedDate:String = ""
     
     
-    @State var AppliedDate:String=""
-    @State var AppliedTime:String=""
+    @State var CreatedDate:String=""
+    @State var CreatedTime:String=""
     
     
     
@@ -136,7 +136,6 @@ struct MainView: View {
         selectedFromButtonIndex = -1
     }
     
-    
     func save_From_JSON_Object(jsonObject: Any, toFilename filename: String) throws -> Bool{
         let fm = FileManager.default
         let urls = fm.urls(for: .documentDirectory, in: .userDomainMask)
@@ -159,6 +158,8 @@ struct MainView: View {
             fileURL = fileURL.appendingPathExtension("json")
             try data.write(to: fileURL, options: [.atomicWrite])
             statusInfo = "Saved Successfully"
+            getDocumentsDirectory();
+            
             ClearAllState()
             return true
         }
@@ -210,12 +211,7 @@ struct MainView: View {
         return current_DateTime
         
     }
-    
-    
-    
-    
-    
-    
+
     func ReadFromClipboard() -> String {
         do {
             if let result =  try? CopyFromClipboard_Paste() {
@@ -237,6 +233,100 @@ struct MainView: View {
     }
     
     
+    func getStatusID(jbstatus:String) -> Int8 {
+        
+        var sid:Int8 = 0;
+        let stat = jbstatus.lowercased()
+        
+        switch stat {
+            case "viewed":
+                sid = 2
+                break
+            case "myeffort":
+                sid = 3
+                break
+            case "phone":
+                sid = 4
+                break
+            case "interview":
+                sid = 5
+                break
+            default:
+                sid = 7
+        }
+        
+        return sid;
+    }
+    
+    func Save_as_JSON() {
+        
+        if JOBSource=="" || JOBStatus == "" || JOBFrom == "" {
+            statusInfo = "Please click Portal, Status and Location button"
+            return
+        }
+
+        //Applied_JOB_info 28_01_2023  2_24 AM  45 sec
+        let filename = "JOB_Status "+Get_Current_DateTime_forFileName();
+
+        
+
+        
+        
+        let dt = Date()
+        let dateFormatter = DateFormatter()
+        //"AppliedDate": "28/01/2023",
+        //"AppliedTime": "2:24:45",
+        dateFormatter.dateFormat = "dd/MM/YYYY"
+        CreatedDate=dateFormatter.string(from: dt)
+        
+        dateFormatter.dateFormat = "HH:mm:ss"
+        CreatedTime=dateFormatter.string(from: dt)
+
+        
+
+        
+        let jbsource = JOBSource.lowercased() as NSString
+        
+        if( jbsource.contains("naukri") || jbsource.contains("monster")  )
+        {
+            JOBSource = JOBSource + "Gulf"
+        }
+        
+        let created = CreatedDate+" "+CreatedTime
+        let jobsources = JOBSource+"-"+JOBFrom+"-Mac App"
+        
+        let statusidd = getStatusID(jbstatus: JOBStatus)
+
+
+        
+        //JSON Object
+        let JobStatusLater_Object = JobStatusLater(
+            Company: Company,
+            Designation: Designation,
+            Status: JOBStatus,
+            StatusID: statusidd,
+            Source: jobsources,
+            Record_Created: created)
+        
+        let arr_JobStatusLater = [JobStatusLater_Object]
+    
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted , .sortedKeys , .withoutEscapingSlashes]
+        
+        //Converting JSON Object to JSON DATA
+        let jsonData = (try? encoder.encode(arr_JobStatusLater))!
+        
+    
+        do {
+            _ = try save_From_JSON_Data(data: jsonData, toFilename: filename)
+        }
+        catch let error {
+           print("error is \(error)")
+        }
+
+        
+    }
     
     
     var body: some View {
@@ -244,30 +334,30 @@ struct MainView: View {
         {
             ScrollView {
                 VStack {
-
+                    
                     VStack {
-
+                        
                         HStack{
                             Text(JOBSource=="" ? "" : "You have selected : \(JOBSource)  \(JOBStatus.uppercased())  \(JOBFrom) " ).font(.largeTitle).foregroundColor(.yellow) .modifier(Shake(animatableData: CGFloat(aniAttempts)))
-
+                            
                             Spacer()
                         }
-
-
+                        
+                        
                     } .padding()
-
+                    
                     Spacer()
-
+                    
                     Group {
-
+                        
                         ScrollView {
                             LazyVGrid(columns: jobsource_columns, spacing: 13) {
-
+                                
                                 ForEach(arrJobSource.indices, id: \.self) { index in
-
+                                    
                                     let item = arrJobSource[index]
-
-
+                                    
+                                    
                                     Text(item)
                                         .padding(.vertical, 10)
                                         .padding(.horizontal, 7)
@@ -290,49 +380,49 @@ struct MainView: View {
                                             selectedPortalButtonIndex = index
                                             withAnimation(.default) {self.aniAttempts += 1}
                                         }
-
-
+                                    
+                                    
                                 }
-
+                                
                             }
                             .padding(.horizontal)
                         }
-
+                        
                         Divider()
                         
                         
-
+                        
                         HStack {
-
+                            
                             let kequi:KeyEquivalent = "o"
                             PasteButtonView(keyshortcut: kequi,stateVariable:$Company,kkey:"O")
-
-
+                            
+                            
                             Spacer()
                                 .frame(width: 10)
                                 .clipped()
-
+                            
                             Text("Company")
                                 .frame(width: 150, alignment: .leading)
                                 .clipped()
                                 .font(.largeTitle)
-
-
+                            
+                            
                             Spacer()
                                 .frame(width: 10)
                                 .clipped()
-
+                            
                             TextField("Company", text: $Company).textFieldStyle(CustomTextFieldStyle())
                             Spacer()
                         }
                         .padding()
-
+                        
                         HStack {
-
+                            
                             let kequi:KeyEquivalent = "d"
                             PasteButtonView(keyshortcut: kequi,stateVariable:$Designation,kkey:"D")
-
-
+                            
+                            
                             Spacer()
                                 .frame(width: 10)
                                 .clipped()
@@ -344,34 +434,34 @@ struct MainView: View {
                             Spacer()
                                 .frame(width: 10)
                                 .clipped()
-
+                            
                             TextField("Designation", text: $Designation).textFieldStyle(CustomTextFieldStyle())
                             Spacer()
                         }
                         .padding()
-
+                        
                         Divider()
                         
                         
-
+                        
                         HStack{
-
+                            
                             Text("Please select the below Status :")
                                 .font(.largeTitle)
                                 .foregroundColor(.white)
                             Spacer()
-
-
+                            
+                            
                         }.padding()
-
+                        
                         ScrollView {
                             LazyVGrid(columns: jobstatus_columns, spacing: 1) {
-
+                                
                                 ForEach(arrJobStatus.indices, id: \.self) { index in
-
+                                    
                                     let item = arrJobStatus[index]
-
-
+                                    
+                                    
                                     Text(item)
                                         .padding(.vertical, 5)
                                         .padding(.horizontal, 8)
@@ -394,40 +484,40 @@ struct MainView: View {
                                             selectedStatusButtonIndex = index
                                             withAnimation(.default) {self.aniAttempts += 1}
                                         }
-
-
+                                    
+                                    
                                 }
-
+                                
                             }
                             .padding(.horizontal)
                         }
-
+                        
                         Divider()
                         
                         
                         
                         
                         HStack{
-
+                            
                             Text("Please select the below Location ")
                                 .font(.largeTitle)
                                 .foregroundColor(.white)
-
+                            
                             Text("(From where you got the above information) :")
                                 .foregroundColor(.white)
-
+                            
                             Spacer()
-
+                            
                         }.padding()
                         
                         ScrollView {
                             LazyVGrid(columns: jobfrom_columns, spacing: 1) {
-
+                                
                                 ForEach(arrJobFrom.indices, id: \.self) { index in
-
+                                    
                                     let item = arrJobFrom[index]
-
-
+                                    
+                                    
                                     Text(item)
                                         .padding(.vertical, 5)
                                         .padding(.horizontal, 8)
@@ -450,19 +540,19 @@ struct MainView: View {
                                             selectedFromButtonIndex = index
                                             withAnimation(.default) {self.aniAttempts += 1}
                                         }
-
-
+                                    
+                                    
                                 }
-
+                                
                             }
                             .padding(.horizontal)
                         }
- 
-                       
                         
                         
                         
-
+                        
+                        
+                        
                     }
                 }
                 .clipped()
@@ -483,7 +573,9 @@ struct MainView: View {
             HStack {
                 Spacer()
                 Button("Save") {
-
+                    
+                    Save_as_JSON()
+                    
                     withAnimation(.default) {self.aniStatusInfo += 1}
                     
                 }    .keyboardShortcut("s", modifiers: [.command])
