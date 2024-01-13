@@ -11,9 +11,15 @@ import SwiftUI
 struct JOB_Status_CaptureApp: App {
     var body: some Scene {
         WindowGroup {
-            MainView() .frame(minWidth: 800, idealWidth: 800, maxWidth: 800,
-                              minHeight: 950, idealHeight: 950, maxHeight: 950,
-                              alignment: .center)
+            
+//            MainView() .frame(minWidth: 800, idealWidth: 800, maxWidth: 800,
+//                              minHeight: 950, idealHeight: 950, maxHeight: 950,
+//                              alignment: .center)
+            
+            
+            MainView()
+            
+            
         }
     }
 }

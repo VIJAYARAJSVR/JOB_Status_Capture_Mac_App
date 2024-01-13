@@ -8,10 +8,6 @@
 import SwiftUI
 
 
-
-
-
-
 struct PasteButtonView: View {
     
     var keyshortcut:KeyEquivalent
